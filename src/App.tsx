@@ -1,14 +1,12 @@
 import { Route, Routes } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "./redux/hook";
-import type { RootState } from "./redux/store";
 import HomeScreen from "./screens/client/Home";
 import ProductScreen from "./screens/client/Product";
 import Dashboard from "./screens/admin/Dashboard";
 import ProductsManager from "./screens/admin/Products";
 
 function App() {
-  const count = useAppSelector((state: RootState) => state.counter.value);
-  const dispatch = useAppDispatch();
+  // const count = useAppSelector((state: RootState) => state.counter.value);
+  // const dispatch = useAppDispatch();
 
   return (
     <>
