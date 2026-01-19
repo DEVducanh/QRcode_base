@@ -1,5 +1,13 @@
+import Header from "../../../components/Header";
+import Product from "../../../components/Product";
+
 const HomeScreen = () => {
-  return <div>index</div>;
+  return (
+    <>
+      <Header />
+      <Product />
+    </>
+  );
 };
 
 export default HomeScreen;
