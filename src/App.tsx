@@ -1,30 +1,26 @@
-import "./App.css";
+import { Route, Routes } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./redux/hook";
-import { decrement, increment } from "./redux/reducer/counter";
+import type { RootState } from "./redux/store";
+import HomeScreen from "./screens/client/Home";
+import ProductScreen from "./screens/client/Product";
+import Dashboard from "./screens/admin/Dashboard";
+import ProductsManager from "./screens/admin/Products";
 
 function App() {
-  const count = useAppSelector((state) => state.counter.value);
+  const count = useAppSelector((state: RootState) => state.counter.value);
   const dispatch = useAppDispatch();
 
   return (
     <>
-      <div>
-        <div>
-          <button
-            aria-label="Increment value"
-            onClick={() => dispatch(increment())}
-          >
-            Increment
-          </button>
-          <span>{count}</span>
-          <button
-            aria-label="Decrement value"
-            onClick={() => dispatch(decrement())}
-          >
-            Decrement
-          </button>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/" element={<HomeScreen />} />
+        <Route path="/products" element={<ProductScreen />} />
+      </Routes>
+
+      <Routes>
+        <Route path="/admin" element={<Dashboard />} />
+        <Route path="/admin/products" element={<ProductsManager />} />
+      </Routes>
     </>
   );
 }
