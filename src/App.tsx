@@ -4,6 +4,7 @@ import ProductScreen from "./components/Product";
 import Dashboard from "./screens/admin/Dashboard";
 import ProductsManager from "./screens/admin/Products";
 import OrderScreen from "./screens/client/OrderScreen";
+import CartScreen from "./screens/client/CartScreen";
 
 function App() {
   // const count = useAppSelector((state: RootState) => state.counter.value);
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<HomeScreen />} />
         <Route path="/products" element={<ProductScreen />} />
         <Route path="/orders" element={<OrderScreen />} />
+        <Route path="/cart" element={<CartScreen />} />
       </Routes>
 
       <Routes>
