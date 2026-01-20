@@ -71,3 +71,34 @@ export const orders = [
     image: "./images/product2.jpg",
   },
 ];
+
+export const cartItems = [
+  {
+    id: 1,
+    name: "Cà phê sữa đá",
+    price: 29000,
+    quantity: 2,
+    image: "/coffee.png",
+  },
+  {
+    id: 2,
+    name: "Bạc xỉu",
+    price: 35000,
+    quantity: 1,
+    image: "/bacxiu.png",
+  },
+  {
+    id: 3,
+    name: "viên chiên",
+    price: 35000,
+    quantity: 1,
+    image: "/vienchien.png",
+  },
+  {
+    id: 4,
+    name: "xuc xich",
+    price: 35000,
+    quantity: 1,
+    image: "/xucxich.png",
+  },
+];
