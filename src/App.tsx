@@ -1,8 +1,9 @@
 import { Route, Routes } from "react-router-dom";
 import HomeScreen from "./screens/client/Home";
-import ProductScreen from "./screens/client/Product";
+import ProductScreen from "./components/Product";
 import Dashboard from "./screens/admin/Dashboard";
 import ProductsManager from "./screens/admin/Products";
+import OrderScreen from "./screens/client/OrderScreen";
 
 function App() {
   // const count = useAppSelector((state: RootState) => state.counter.value);
@@ -13,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomeScreen />} />
         <Route path="/products" element={<ProductScreen />} />
+        <Route path="/orders" element={<OrderScreen />} />
       </Routes>
 
       <Routes>
