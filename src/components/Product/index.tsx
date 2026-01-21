@@ -4,8 +4,10 @@ import { Plus } from "lucide-react";
 import { categories } from "../../constant/data";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { fetchProducts, setCartCount } from "../../redux/reducer/product";
+import { useMessageApi } from "../../lib/messageContext";
 
 const Product = () => {
+  const messageApi = useMessageApi();
   const [activeCategory, setActiveCategory] = useState("All");
   const { products, loading } = useAppSelector((state) => state.product);
   const dispatch = useAppDispatch();
@@ -14,6 +16,10 @@ const Product = () => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
+  const handleAddToCart = () => {
+    dispatch(setCartCount());
+    messageApi.success("Đã thêm sản phẩm vào giỏ");
+  };
   if (loading) return "loadding...";
   return (
     <div className="px-4 mt-4 mb-20">
@@ -66,7 +72,7 @@ const Product = () => {
               <Button
                 size="icon"
                 className="h-9 w-9 rounded-full bg-[#aee2ff] hover:bg-[#aee2ff]/80 text-[#4a2c5d] transition-transform duration-200 active:scale-90"
-                onClick={() => dispatch(setCartCount())}
+                onClick={handleAddToCart}
               >
                 <Plus size={18} />
               </Button>
