@@ -4,11 +4,11 @@ import ProductScreen from "../../../components/Product";
 
 const HomeScreen = () => {
   return (
-    <>
+    <div>
       <Header />
       <Banner />
       <ProductScreen />
-    </>
+    </div>
   );
 };
 
