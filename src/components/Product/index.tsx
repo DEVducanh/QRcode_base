@@ -1,16 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
-import { categories, products } from "../../constant/data";
+import { categories } from "../../constant/data";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { fetchProducts, setCartCount } from "../../redux/reducer/product";
 
 const Product = () => {
   const [activeCategory, setActiveCategory] = useState("All");
+  const { products, loading } = useAppSelector((state) => state.product);
+  const dispatch = useAppDispatch();
 
-  const filteredProducts =
-    activeCategory === "All"
-      ? products
-      : products.filter((product) => product.category === activeCategory);
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
+  if (loading) return "loadding...";
   return (
     <div className="px-4 mt-4 mb-20">
       {/* Category Filter */}
@@ -19,7 +23,7 @@ const Product = () => {
           <Button
             key={category}
             variant={activeCategory === category ? "default" : "outline"}
-            className={`rounded-full px-5 h-9 text-sm font-medium whitespace-nowrap ${
+            className={`rounded-full px-5 h-9 text-sm font-semibold whitespace-nowrap ${
               activeCategory === category
                 ? "bg-[#4a2c5d] text-white hover:bg-[#4a2c5d]/90"
                 : "border-gray-200 text-gray-600"
@@ -33,15 +37,18 @@ const Product = () => {
 
       {/* Product Grid */}
       <div className="grid grid-cols-2 gap-4 mt-2">
-        {filteredProducts.map((product) => (
+        {products.map((product) => (
           <div
-            key={product.id}
+            key={product._id}
             className="bg-white rounded-2xl p-3 shadow-xs border border-gray-100 flex flex-col"
           >
             <div className="aspect-square rounded-xl overflow-hidden mb-3 bg-gray-100 relative">
-              {/* Placeholder until real images are available */}
               <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                Image
+                <img
+                  src={product.image_url}
+                  alt="Product"
+                  className="w-full h-full object-cover"
+                />
               </div>
               {/* <img
                 src={product.image}
@@ -49,14 +56,17 @@ const Product = () => {
                 className="w-full h-full object-cover"
               /> */}
             </div>
-            <h3 className="font-semibold text-[#4a2c5d] text-sm mb-1 line-clamp-2 min-h-[40px]">
-              {product.name}
+            <h3 className="font-semibold text-[#4a2c5d] text-sm mb-1 line-clamp-2 min-h-10">
+              {product.product_name}
             </h3>
             <div className="flex items-center justify-between mt-auto">
-              <span className="font-bold text-[#4a2c5d]">{product.price}</span>
+              <span className="font-bold text-[#4a2c5d]">
+                {(product.price * 1000).toLocaleString("vi-VN")}đ
+              </span>
               <Button
                 size="icon"
-                className="h-8 w-8 rounded-full bg-[#aee2ff] hover:bg-[#aee2ff]/80 text-[#4a2c5d]"
+                className="h-9 w-9 rounded-full bg-[#aee2ff] hover:bg-[#aee2ff]/80 text-[#4a2c5d] transition-transform duration-200 active:scale-90"
+                onClick={() => dispatch(setCartCount())}
               >
                 <Plus size={18} />
               </Button>
