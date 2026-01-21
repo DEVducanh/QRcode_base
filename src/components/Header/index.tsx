@@ -8,9 +8,12 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { cartItems } from "../../constant/data";
 import { Button } from "../ui/button";
+import { useAppSelector } from "../../redux/hook";
+import type { RootState } from "../../redux/store";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { cartCount } = useAppSelector((state: RootState) => state.product);
   return (
     <div className="relative h-15 bg-[#f9f5ff] flex items-center justify-center ">
       <img
@@ -25,7 +28,7 @@ const Header = () => {
           <DropdownMenuTrigger asChild>
             <div className="relative cursor-pointer p-1">
               <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-white text-xs">
-                {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+                {cartCount}
               </span>
               <ShoppingBasket className="text-[#4a2c5d]" />
             </div>
@@ -60,7 +63,7 @@ const Header = () => {
                   </div>
                 ))}
 
-                <div className="pt-2">
+                <div className="pt-1 bg-white sticky bottom-0">
                   <Button
                     className="w-full bg-[#4a2c5d] text-white text-sm py-2 rounded"
                     onClick={() => navigate("/cart")}
