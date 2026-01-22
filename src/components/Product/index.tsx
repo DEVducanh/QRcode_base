@@ -9,11 +9,12 @@ import {
 } from "../../redux/reducer/product";
 import { useMessageApi } from "../../lib/messageContext";
 import { Skeleton } from "../ui/skeleton";
+import { PaginationDemo } from "../Pagination";
 
 const Product = () => {
   const messageApi = useMessageApi();
   const dispatch = useAppDispatch();
-  const { products, loading, filterProduct } = useAppSelector(
+  const { products, loading, filterProduct, page } = useAppSelector(
     (state) => state.product,
   );
   const categories = [
@@ -23,7 +24,7 @@ const Product = () => {
 
   useEffect(() => {
     dispatch(fetchProducts());
-  }, [dispatch, filterProduct]);
+  }, [dispatch, filterProduct, page]);
 
   const handleAddToCart = () => {
     dispatch(setCartCount());
@@ -42,7 +43,7 @@ const Product = () => {
       </div>
     );
   return (
-    <div className="px-4 mt-4 mb-20">
+    <div className="px-4 mt-4">
       {/* Category Filter */}
       <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
         <Button
@@ -78,7 +79,7 @@ const Product = () => {
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-2 gap-4 mt-2">
+      <div className="grid grid-cols-2 gap-4 mt-2 mb-22">
         {products.map((product) => (
           <div
             key={product._id}
@@ -111,6 +112,8 @@ const Product = () => {
           </div>
         ))}
       </div>
+
+      <PaginationDemo />
     </div>
   );
 };
