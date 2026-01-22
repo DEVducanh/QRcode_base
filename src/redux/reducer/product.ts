@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getAllProducts } from "../../services/product.service";
 import type { IProduct } from "../../types/product.type";
+import type { RootState } from "../store";
 
 export interface IState {
   products: IProduct[];
   loading: boolean;
   error: string;
+  filterProduct: string;
   cartCount: number;
 }
 
@@ -13,6 +15,7 @@ const initialState: IState = {
   products: [],
   loading: false,
   error: "",
+  filterProduct: "",
   cartCount: 0,
 };
 
@@ -22,6 +25,10 @@ export const ProductSlice = createSlice({
   reducers: {
     setCartCount: (state) => {
       state.cartCount += 1;
+    },
+
+    setFilter: (state, action) => {
+      state.filterProduct = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -43,16 +50,13 @@ export const ProductSlice = createSlice({
 
 export const fetchProducts = createAsyncThunk<IProduct[]>(
   "products/fetchAll",
-  async () => {
-    try {
-      const data = await getAllProducts();
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
+  async (_, { getState }) => {
+    const filter = (getState() as RootState).product.filterProduct;
+    const data = await getAllProducts(filter);
+    return data;
   },
 );
 
-export const { setCartCount } = ProductSlice.actions;
+export const { setCartCount, setFilter } = ProductSlice.actions;
 
 export default ProductSlice.reducer;

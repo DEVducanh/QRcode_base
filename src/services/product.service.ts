@@ -1,6 +1,8 @@
-export const getAllProducts = async () => {
+export const getAllProducts = async (filter?: string) => {
   try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/products`);
+    let query = "";
+    if (filter) query = filter ? `?filter=${filter}` : "";
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/products${query}`);
     if (!res.ok) {
       throw new Error("Failed to fetch products");
     }
