@@ -15,7 +15,7 @@ const Header = () => {
   const navigate = useNavigate();
   const { cartCount } = useAppSelector((state: RootState) => state.product);
   return (
-    <div className="relative h-15 bg-[#f9f5ff] flex items-center justify-center ">
+    <div className="sticky top-0 z-50 h-15 bg-[#f9f5ff] flex items-center justify-center shadow-lg ">
       <img
         src={"./images/logo.svg"}
         alt="Logo"
