@@ -2,14 +2,12 @@ import { useEffect } from "react";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import {
-  fetchProducts,
-  setCartCount,
-  setFilter,
-} from "../../redux/reducer/product";
+import { fetchProducts, setFilter } from "../../redux/reducer/product";
+import { addToCart, fetchCartItems } from "../../redux/reducer/cart";
 import { useMessageApi } from "../../lib/messageContext";
 import { Skeleton } from "../ui/skeleton";
 import { PaginationDemo } from "../Pagination";
+import { getCartIdFromStorage } from "../../lib/localStorage";
 
 const Product = () => {
   const messageApi = useMessageApi();
@@ -26,9 +24,29 @@ const Product = () => {
     dispatch(fetchProducts());
   }, [dispatch, filterProduct, page]);
 
-  const handleAddToCart = () => {
-    dispatch(setCartCount());
-    messageApi.success("Đã thêm sản phẩm vào giỏ");
+  const handleAddToCart = (productId: string) => {
+    const cartId = getCartIdFromStorage();
+
+    if (!cartId) {
+      messageApi.error("Vui lòng quét mã QR bàn trước");
+      return;
+    }
+
+    dispatch(
+      addToCart({
+        cartId: cartId,
+        productId: productId,
+        quantity: 1,
+      }),
+    )
+      .unwrap()
+      .then(() => {
+        messageApi.success("Đã thêm sản phẩm vào giỏ");
+        dispatch(fetchCartItems(cartId));
+      })
+      .catch((error) => {
+        messageApi.error(error || "Không thể thêm sản phẩm");
+      });
   };
   if (loading)
     return (
@@ -104,7 +122,7 @@ const Product = () => {
               <Button
                 size="icon"
                 className="h-9 w-9 rounded-full bg-[#aee2ff] hover:bg-[#aee2ff]/80 text-[#4a2c5d] transition-transform duration-200 active:scale-90"
-                onClick={handleAddToCart}
+                onClick={() => handleAddToCart(product._id ? product._id : "")}
               >
                 <Plus size={18} />
               </Button>

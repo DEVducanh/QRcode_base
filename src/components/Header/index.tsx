@@ -6,14 +6,15 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Link, useNavigate } from "react-router-dom";
-import { cartItems } from "../../constant/data";
 import { Button } from "../ui/button";
 import { useAppSelector } from "../../redux/hook";
 import type { RootState } from "../../redux/store";
+import { useFetchCartItems } from "../../hooks/useFetchCartItem";
 
 const Header = () => {
+  useFetchCartItems();
   const navigate = useNavigate();
-  const { cartCount } = useAppSelector((state: RootState) => state.product);
+  const { cartItems } = useAppSelector((state: RootState) => state.cart);
   return (
     <div className="sticky top-0 z-50 h-15 bg-[#f9f5ff] flex items-center justify-center shadow-lg ">
       <img
@@ -27,8 +28,8 @@ const Header = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="relative cursor-pointer p-1">
-              <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-white text-xs">
-                {cartCount}
+              <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-white text-[10px]">
+                {cartItems.length}
               </span>
               <ShoppingBasket className="text-[#4a2c5d]" />
             </div>
@@ -45,19 +46,22 @@ const Header = () => {
               <>
                 {cartItems.map((item) => (
                   <div
-                    key={item.id}
+                    key={item._id}
                     className="flex gap-3 py-2 border-b last:border-b-0"
                   >
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={item.product_id.image_url}
+                      alt={item.product_id.product_name}
                       className="w-10 h-10 rounded object-cover"
                     />
 
                     <div className="flex-1">
-                      <p className="text-sm font-medium">{item.name}</p>
+                      <p className="text-sm font-medium">
+                        {item.product_id.product_name}
+                      </p>
                       <p className="text-xs text-gray-500">
-                        {item.price.toLocaleString()}đ x {item.quantity}
+                        {(item.product_id.price * 1000).toLocaleString()}đ x{" "}
+                        {item.quantity}
                       </p>
                     </div>
                   </div>
