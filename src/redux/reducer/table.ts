@@ -5,7 +5,7 @@ import type { ISession } from "../../types/session";
 import type { ICart } from "../../types/cart.type";
 import { getTableByQRCode } from "../../services/table.service";
 
-interface TableState {
+interface IState {
   currentTable: Table | null;
   currentSession: ISession | null;
   currentCart: ICart | null;
@@ -13,7 +13,7 @@ interface TableState {
   error: string | null;
 }
 
-const initialState: TableState = {
+const initialState: IState = {
   currentTable: null,
   currentSession: null,
   currentCart: null,
