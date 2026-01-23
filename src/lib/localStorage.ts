@@ -1,4 +1,5 @@
 import type { ICart } from "../types/cart.type";
+import type { ISession } from "../types/session";
 
 /**
  * Lấy cart từ localStorage
@@ -43,4 +44,22 @@ export const saveCartToStorage = (cart: ICart): void => {
  */
 export const removeCartFromStorage = (): void => {
   localStorage.removeItem("currentCart");
+};
+
+export const getSessionFromStorage = (): ISession | null => {
+  try {
+    const savedSession = localStorage.getItem("currentSession");
+    if (!savedSession) return null;
+
+    const sessionData = JSON.parse(savedSession);
+    return sessionData;
+  } catch (error) {
+    console.error("Error parsing session from localStorage:", error);
+    return null;
+  }
+};
+
+export const getSessionIdFromStorage = (): string | null => {
+  const session = getSessionFromStorage();
+  return session?._id || null;
 };
