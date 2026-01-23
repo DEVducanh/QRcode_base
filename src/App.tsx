@@ -5,15 +5,14 @@ import Dashboard from "./screens/admin/Dashboard";
 import ProductsManager from "./screens/admin/Products";
 import OrderScreen from "./screens/client/OrderScreen";
 import CartScreen from "./screens/client/CartScreen";
+import QRScan from "./components/QRScanPage";
 
 function App() {
-  // const count = useAppSelector((state: RootState) => state.counter.value);
-  // const dispatch = useAppDispatch();
-
   return (
     <>
       <Routes>
         <Route path="/" element={<HomeScreen />} />
+        <Route path="/table/:tableCode" element={<QRScan />} />
         <Route path="/products" element={<ProductScreen />} />
         <Route path="/orders" element={<OrderScreen />} />
         <Route path="/cart" element={<CartScreen />} />

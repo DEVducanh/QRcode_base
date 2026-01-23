@@ -1,13 +1,27 @@
 import HeaderBack from "../../../components/Header/HeaderBack";
 import { Button } from "../../../components/ui/button";
-import { cartItems } from "../../../constant/data";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../../redux/hook";
+import { useFetchCartItems } from "../../../hooks/useFetchCartItem";
+import {
+  updateItemQuantity,
+  removeItem,
+  fetchCartItems,
+} from "../../../redux/reducer/cart";
+import { getCartIdFromStorage } from "../../../lib/localStorage";
+import { Minus, Plus } from "lucide-react";
+import { useState } from "react";
+import ModalConfirm from "../../../components/Modal/ModalConfirm";
 
 const CartScreen = () => {
+  useFetchCartItems();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { cartItems } = useAppSelector((state) => state.cart);
+  const [itemToRemove, setItemToRemove] = useState<string | null>(null);
 
   const totalAmount = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+    (acc, item) => acc + item.product_id.price * item.quantity * 1000,
     0,
   );
 
@@ -18,12 +32,44 @@ const CartScreen = () => {
     }).format(value);
   };
 
+  const handleUpdateQuantity = (
+    itemId: string,
+    newQuantity: number,
+    currentQuantity: number,
+  ) => {
+    const cartId = getCartIdFromStorage();
+    if (!cartId) return;
+
+    if (currentQuantity === 1 && newQuantity < 1) {
+      setItemToRemove(itemId);
+      return;
+    }
+
+    dispatch(updateItemQuantity({ cartId, itemId, quantity: newQuantity }))
+      .unwrap()
+      .then(() => {
+        dispatch(fetchCartItems(cartId));
+      });
+  };
+
+  const handleRemoveItem = () => {
+    const cartId = getCartIdFromStorage();
+    if (!cartId || !itemToRemove) return;
+
+    dispatch(removeItem({ cartId, itemId: itemToRemove }))
+      .unwrap()
+      .then(() => {
+        dispatch(fetchCartItems(cartId));
+        setItemToRemove(null);
+      });
+  };
+
   const handleOrder = () => {
     navigate("/orders");
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f5ff] pt-5 pb-24">
+    <div className="min-h-screen bg-[#f9f5ff] pt-5 pb-35">
       <HeaderBack />
       <div className="px-4 mt-4">
         <h2 className="text-xl font-bold text-[#4a2c5d] mb-4">
@@ -45,14 +91,14 @@ const CartScreen = () => {
           <div className="flex flex-col gap-3">
             {cartItems.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex gap-3"
               >
                 <div className="w-20 h-20 bg-gray-100 rounded-xl flex-shrink-0 overflow-hidden">
                   {/* Placeholder until real images are available - reverting to img tag if data has valid paths, or keep placeholder */}
                   <img
-                    src={item.image}
-                    alt={item.name}
+                    src={item.product_id.image_url}
+                    alt={item.product_id.product_name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
@@ -66,16 +112,51 @@ const CartScreen = () => {
                 <div className="flex-1 flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <h3 className="font-semibold text-[#4a2c5d] text-sm line-clamp-1">
-                      {item.name}
+                      {item.product_id.product_name}
                     </h3>
                   </div>
                   <div className="flex justify-between items-end mt-2">
-                    <div className="text-gray-500 text-xs">
-                      {formatCurrency(item.price)} x {item.quantity}
+                    <div className="text-sm text-gray-600">
+                      {formatCurrency(item.product_id.price * 1000)}
                     </div>
-                    <div className="font-bold text-[#4a2c5d]">
-                      {formatCurrency(item.price * item.quantity)}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-7 w-7 rounded-full border-[#4a2c5d] text-[#4a2c5d] hover:bg-[#4a2c5d] hover:text-white"
+                        onClick={() =>
+                          handleUpdateQuantity(
+                            item._id,
+                            item.quantity - 1,
+                            item.quantity,
+                          )
+                        }
+                      >
+                        <Minus size={14} />
+                      </Button>
+                      <span className="w-8 text-center font-semibold text-[#4a2c5d]">
+                        {item.quantity}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-7 w-7 rounded-full border-[#4a2c5d] text-[#4a2c5d] hover:bg-[#4a2c5d] hover:text-white"
+                        onClick={() =>
+                          handleUpdateQuantity(
+                            item._id,
+                            item.quantity + 1,
+                            item.quantity,
+                          )
+                        }
+                      >
+                        <Plus size={14} />
+                      </Button>
                     </div>
+                  </div>
+                  <div className="text-right font-bold text-[#4a2c5d] text-sm mt-1">
+                    {formatCurrency(
+                      item.product_id.price * item.quantity * 1000,
+                    )}
                   </div>
                 </div>
               </div>
@@ -102,6 +183,15 @@ const CartScreen = () => {
             </Button>
           </div>
         </div>
+      )}
+      {itemToRemove && (
+        <ModalConfirm
+          title="Có chắc xóa?"
+          description="Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?"
+          onConfirm={handleRemoveItem}
+          onCancel={() => setItemToRemove(null)}
+          open={!!itemToRemove}
+        />
       )}
     </div>
   );
