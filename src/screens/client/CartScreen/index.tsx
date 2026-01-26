@@ -8,17 +8,22 @@ import {
   removeItem,
   fetchCartItems,
 } from "../../../redux/reducer/cart";
+import { createOrder } from "../../../redux/reducer/order";
 import { getCartIdFromStorage } from "../../../lib/localStorage";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
 import ModalConfirm from "../../../components/Modal/ModalConfirm";
+import { useMessageApi } from "../../../lib/messageContext";
 
 const CartScreen = () => {
   useFetchCartItems();
+  const messageApi = useMessageApi();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { cartItems } = useAppSelector((state) => state.cart);
+  const { loading: orderLoading } = useAppSelector((state) => state.order);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
+  const [isConfirmOrder, setIsConfirmOrder] = useState<boolean>(false);
 
   const totalAmount = cartItems.reduce(
     (acc, item) => acc + item.product_id.price * item.quantity * 1000,
@@ -64,8 +69,20 @@ const CartScreen = () => {
       });
   };
 
-  const handleOrder = () => {
-    navigate("/orders");
+  const handleOrder = async () => {
+    const cartId = getCartIdFromStorage();
+    if (!cartId) {
+      alert("Không tìm thấy giỏ hàng");
+      return;
+    }
+
+    try {
+      await dispatch(createOrder(cartId)).unwrap();
+      messageApi.success("Đơn hàng đã được tạo thành công");
+      navigate("/");
+    } catch (error) {
+      messageApi.error("Không thể tạo đơn hàng");
+    }
   };
 
   return (
@@ -177,9 +194,10 @@ const CartScreen = () => {
             </div>
             <Button
               className="w-full rounded-full bg-[#aee2ff] hover:bg-[#aee2ff]/90 text-[#4a2c5d] font-bold h-12 text-base"
-              onClick={handleOrder}
+              onClick={() => setIsConfirmOrder(true)}
+              disabled={orderLoading}
             >
-              Gọi món
+              {orderLoading ? "Đang xử lý..." : "Gọi món"}
             </Button>
           </div>
         </div>
@@ -191,6 +209,16 @@ const CartScreen = () => {
           onConfirm={handleRemoveItem}
           onCancel={() => setItemToRemove(null)}
           open={!!itemToRemove}
+        />
+      )}
+
+      {isConfirmOrder && (
+        <ModalConfirm
+          title="Xác nhận gọi món?"
+          description="Bạn có chắc chắn muốn gọi món không?"
+          onConfirm={handleOrder}
+          onCancel={() => setIsConfirmOrder(false)}
+          open={isConfirmOrder}
         />
       )}
     </div>

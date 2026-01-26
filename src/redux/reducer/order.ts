@@ -1,17 +1,39 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { IOrderItem } from "../../types/order.type";
+import {
+  createSlice,
+  createAsyncThunk,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
+import type { IOrderItem, IOrderResponse } from "../../types/order.type";
+import { createOrder as createOrderAPI } from "../../services/order.service";
 
 interface OrderState {
   orderItems: IOrderItem[];
+  currentOrder: IOrderResponse | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: OrderState = {
   orderItems: [],
+  currentOrder: null,
   loading: false,
   error: null,
 };
+
+// Async thunk để tạo order
+export const createOrder = createAsyncThunk(
+  "order/createOrder",
+  async (cartId: string, { rejectWithValue }) => {
+    try {
+      const response = await createOrderAPI(cartId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Không thể tạo đơn hàng",
+      );
+    }
+  },
+);
 
 const orderSlice = createSlice({
   name: "order",
@@ -41,6 +63,29 @@ const orderSlice = createSlice({
         state.orderItems[itemIndex].status = Number(status);
       }
     },
+    clearCurrentOrder: (state) => {
+      state.currentOrder = null;
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Xử lý createOrder
+      .addCase(createOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentOrder = action.payload;
+        if (action.payload.items) {
+          state.orderItems = action.payload.items;
+        }
+      })
+      .addCase(createOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 
@@ -49,6 +94,7 @@ export const {
   fetchOrderItemsSuccess,
   fetchOrderItemsFailure,
   updateOrderItemStatus,
+  clearCurrentOrder,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
